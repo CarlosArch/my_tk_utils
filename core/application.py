@@ -53,6 +53,9 @@ class Page(ttk.Frame):
         # return frame
         return frame
 
+    def quit(self):
+        self.destroy()
+
 class Window(tk.Tk):
     window_title = ''
     initial_page = None
@@ -77,6 +80,8 @@ class Window(tk.Tk):
 
         self.show_page(self.initial_page)
 
+        self.protocol("WM_DELETE_WINDOW", self.quit)
+
     def generate_menu(self, menu):
         return menu
 
@@ -94,6 +99,11 @@ class Window(tk.Tk):
         if not page in self.pages:
             self.load_page(page)
         self.pages[page].tkraise()
+
+    def quit(self):
+        for page in self.pages.values():
+            page.quit()
+        self.destroy()
 
 if __name__ == "__main__":
     class TestHomePage(Page):
