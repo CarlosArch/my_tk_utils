@@ -1,2 +1,2 @@
 # my_tk_utils
- Utilities for tkinter applications
+My own utilities for tkinter applications.
