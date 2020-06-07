@@ -6,7 +6,7 @@ import time
 import tkinter as tk
 from tkinter import ttk
 
-from application import Window, Page
+from .applications import Window, Page
 
 
 class CommandLine(ttk.Frame):
@@ -73,11 +73,12 @@ class Subprocess:
     def read_pipe(self):
         while True:
             if hasattr(self, 'process'):
-                output = self.process.stdout.readline()
-                error = self.process.stderr.readline()
+                output = self.process.stdout.read()
+                error = self.process.stderr.read()
                 if output or error:
                     self.queue.put((output, error))
-                    self.update_func(self.queue)
+                    if self.update_func is not None:
+                        self.update_func(self.queue)
             time.sleep(self.delay_s)
 
     def quit(self):
