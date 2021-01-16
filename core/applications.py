@@ -10,8 +10,9 @@ XSMALL_FONT = (MAIN_FONT, 6)
 
 class Page(ttk.Frame):
     title = ''
-    def __init__(self, parent, *args, **kwargs):
-        super().__init__(parent.main, *args, **kwargs)
+    def __init__(self, master):
+        self.master = master
+        super().__init__(master)
 
         self.header = self.make_header(ttk.Frame(self))
         if self.header:
@@ -65,10 +66,8 @@ class Window(tk.Tk):
         super().__init__(*args, **kwargs)
         self.title(self.window_title)
 
-        self.main = ttk.Frame(self)
-        self.main.pack(fill="both", expand=True)
-        self.main.grid_rowconfigure(0, weight=1)
-        self.main.grid_columnconfigure(0, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
         self.menu = self.generate_menu(tk.Menu(self))
         if self.menu:
@@ -89,8 +88,10 @@ class Window(tk.Tk):
         """
         Loads a page into Application
         """
-        self.pages[page] = page(parent=self)
-        self.pages[page].grid(row=0, column=0, sticky='nsew')
+        self.pages[page] = page(master=self)
+        self.pages[page].grid(row=0,
+                              column=0,
+                              sticky='nsew')
 
     def show_page(self, page):
         """
@@ -99,6 +100,11 @@ class Window(tk.Tk):
         if not page in self.pages:
             self.load_page(page)
         self.pages[page].tkraise()
+        self.update_idletasks()
+        page_width = self.pages[page].winfo_reqwidth()
+        page_height = self.pages[page].winfo_reqheight()
+        self.minsize(page_width, page_height)
+        self.geometry(f'{page_width}x{page_height}')
 
     def quit(self):
         for page in self.pages.values():

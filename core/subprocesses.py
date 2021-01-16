@@ -34,7 +34,7 @@ class CommandLine(ttk.Frame):
 
     def update(self, queue):
         if not queue.empty():
-            output, error = queue.get()
+            output, error, returncode = queue.get()
             self.txt_output.configure(state="normal")
             self.txt_output.insert(tk.END, output)
             self.txt_output.insert(tk.END, error, 'ERR')
@@ -61,7 +61,9 @@ class Subprocess:
         self.delay_s = delay_s
 
         self.queue = Queue()
-        self.thread = Thread(target=self.read_pipe, daemon=True)
+        self.thread = Thread(target=self.read_pipe,
+                             name='PIPE reader',
+                             daemon=True)
         self.thread.start()
 
     def communicate(self, input: str = None, shell=False):
@@ -73,12 +75,17 @@ class Subprocess:
     def read_pipe(self):
         while True:
             if hasattr(self, 'process'):
+                self.process.poll()
                 output = self.process.stdout.read()
                 error = self.process.stderr.read()
-                if output or error:
-                    self.queue.put((output, error))
+                returncode = self.process.returncode
+                if output or error or returncode is not None:
+                    self.queue.put((output, error, returncode))
                     if self.update_func is not None:
                         self.update_func(self.queue)
+                if returncode is not None:
+                    self.process.kill()
+                    del self.process
             time.sleep(self.delay_s)
 
     def quit(self):

@@ -212,12 +212,14 @@ class Form(ttk.Frame):
             item.label.grid(row=i, column=0, sticky='e')
             item.widget.grid(row=i, column=1, sticky='ew')
         i += 1
-        frame = tk.Frame(self)
-        frame.grid(row=i, columnspan=2, pady=(5, 0))
+        buttons_frame = tk.Frame(self)
+        buttons_frame.grid(row=i, columnspan=2, pady=(5, 0))
 
-        clear_button = ttk.Button(frame, text="Clear", command=self.clear)
+        clear_button = ttk.Button(buttons_frame, text="Clear",
+                                  command=self.clear)
         clear_button.grid(row=0, column=0, padx=(0, 5))
-        submit_button = ttk.Button(frame, text="Submit", command=self.submit)
+        submit_button = ttk.Button(buttons_frame, text="Submit",
+                                   command=self.submit)
         submit_button.grid(row=0, column=1, padx=(5, 0))
 
     def pack(self, *args, **kwargs):
